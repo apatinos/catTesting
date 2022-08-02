@@ -29,7 +29,7 @@ describe('CatController', () => {
               .mockReturnValue(new CatDto('testcat 1', 'testbreed 1', 2)),
             findOne: jest
               .fn()
-              .mockRejectedValue('no se encontro del gato con el  nombre: test 1'),
+              .mockReturnValue(new CatDto('testcat 1', 'testbreed 1', 2)),
             remove: jest
               .fn()
               .mockReturnValue([
@@ -62,15 +62,16 @@ describe('CatController', () => {
     expect(updateCallFunction.age).toEqual(2);
   });
 
-  fit('should findOne a cat structure', () => {
+  it('should findOne a cat structure', () => {
     let findOneCallFunction = controller.findOne('testcat 1');
-    expect(findOneCallFunction).toThrow();
+    expect(findOneCallFunction.age).toEqual(2);
   });
 
   it('should findAll cat structures', () => {
     let findOneCallFunction = controller.findAll();
     expect(findOneCallFunction.length).toEqual(3);
   });
+
 
   it('should findAll cat structures', () => {
     let findOneCallFunction = controller.remove('testcat 4');
