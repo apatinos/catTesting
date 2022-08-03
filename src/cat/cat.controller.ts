@@ -1,33 +1,48 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CatService } from './cat.service';
-import { CatDto } from './dto/cat.dto';
+import { CreateCatDto } from './dto/create-cat.dto';
+import { UpdateCatDto } from './dto/update-cat.dto';
+import { Observable } from 'rxjs';
+import { Cat } from './entities/cat.entity';
+import { AxiosResponse } from 'axios';
 
-@Controller('cat')
+@Controller('Cat')
 export class CatController {
-  constructor(private readonly catService: CatService) {}
+  constructor(private readonly CatService: CatService) {}
 
   @Post()
-  create(@Body() createCatDto: CatDto) {
-    return this.catService.create(createCatDto);
+  create(@Body() createCatDto: CreateCatDto): Observable<AxiosResponse<Cat[]>> {
+    return this.CatService.create(createCatDto);
   }
 
   @Get()
-  findAll() {
-    return this.catService.findAll();
+  findAll(): Observable<AxiosResponse<Cat[]>> {
+    return this.CatService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.catService.findOne(id);
+  findOne(@Param('id') id: string): Observable<AxiosResponse<Cat>> {
+    return this.CatService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCatDto: CatDto) {
-    return this.catService.update(id, updateCatDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateCatDto: UpdateCatDto,
+  ): Observable<AxiosResponse<Cat>> {
+    return this.CatService.update(+id, updateCatDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.catService.remove(id);
+  remove(@Param('id') id: string): Observable<AxiosResponse<any>> {
+    return this.CatService.remove(+id);
   }
 }

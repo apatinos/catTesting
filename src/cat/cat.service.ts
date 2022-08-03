@@ -1,44 +1,46 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CatDto } from './dto/cat.dto';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
+import { AxiosResponse } from 'axios';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { CreateCatDto } from './dto/create-cat.dto';
+import { UpdateCatDto } from './dto/update-cat.dto';
 import { Cat } from './entities/cat.entity';
 
 @Injectable()
 export class CatService {
-  cats: Cat[] = [
-    new CatDto('testcat 1', 'testbreed 1', 1),
-    new CatDto('testcat 2', 'testbreed 2', 2),
-    new CatDto('testcat 3', 'testbreed 3', 3),
-  ];
+  constructor(private httpService: HttpService) {}
 
-  create(createCatDto: CatDto) {
-    let cat: Cat = {
-      ...createCatDto,
-    };
-    this.cats.push(cat);
-    return cat;
+  create(createCatDto: CreateCatDto): Observable<AxiosResponse<any>> {
+    return this.httpService
+      .post('http://localhost:3000/cat', createCatDto)
+      .pipe(map((response) => response.data));
   }
 
-  findAll() {
-    return this.cats;
+  findAll(): Observable<AxiosResponse<Cat[]>> {
+    return this.httpService
+      .get('http://localhost:3000/cat')
+      .pipe(map((response) => response.data));
   }
 
-  findOne(name: string) {
-    const catFinded  = this.cats.find((cat)=> cat.name == name);
-    if(!catFinded){
-      throw new BadRequestException('no se encontro del gato con el  nombre: '+name)
-    }
-    return catFinded;
+  findOne(id: number): Observable<AxiosResponse<Cat>> {
+    return this.httpService
+      .get(`http://localhost:3000/cat/${id}`)
+      .pipe(map((response) => response.data));
   }
 
-  update(name: string, updateCatDto: Cat) {
-    this.cats.map((cat)=>{if(cat.name == name) return updateCatDto});
-    return updateCatDto;
+  update(
+    id: number,
+    updateCatDto: UpdateCatDto,
+  ): Observable<AxiosResponse<Cat>> {
+    return this.httpService
+      .put(`http://localhost:3000/cat/${id}`, updateCatDto)
+      .pipe(map((response) => response.data));
   }
 
-  remove(name: string) {
-    this.cats = this.cats.filter((cat)=>{
-      return cat.name != name
-    })
-    return this.cats;
+  remove(id: number): Observable<AxiosResponse<void>> {
+    return this.httpService
+      .delete(`http://localhost:3000/cat/${id}`)
+      .pipe(map((response) => response.data));
   }
 }

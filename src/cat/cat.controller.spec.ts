@@ -1,11 +1,19 @@
-import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { of } from 'rxjs';
 import { CatController } from './cat.controller';
 import { CatService } from './cat.service';
-import { CatDto } from './dto/cat.dto';
+
+const testCat = { id: 1, name: 'Test cat', age: 5, breed: 'Russian Blue' };
+const testCatUpdate = {
+  id: 1,
+  name: 'Test cat Update',
+  age: 5,
+  breed: 'Russian Blue',
+};
 
 describe('CatController', () => {
   let controller: CatController;
+  let service: CatService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,69 +22,65 @@ describe('CatController', () => {
         {
           provide: CatService,
           useValue: {
-            create: jest
-              .fn()
-              .mockReturnValue(new CatDto('testcat 4', 'testbreed 4', 4)),
-            findAll: jest
-              .fn()
-              .mockReturnValue([
-                new CatDto('testcat 1', 'testbreed 1', 1),
-                new CatDto('testcat 2', 'testbreed 2', 2),
-                new CatDto('testcat 3', 'testbreed 3', 3),
-              ]),
-            update: jest
-              .fn()
-              .mockReturnValue(new CatDto('testcat 1', 'testbreed 1', 2)),
-            findOne: jest
-              .fn()
-              .mockReturnValue(new CatDto('testcat 1', 'testbreed 1', 2)),
-            remove: jest
-              .fn()
-              .mockReturnValue([
-                new CatDto('testcat 1', 'testbreed 1', 1),
-                new CatDto('testcat 2', 'testbreed 2', 2),
-                new CatDto('testcat 3', 'testbreed 3', 3),
-              ]),
+            findAll: jest.fn(() => of([testCat])),
+            findOne: jest.fn(() => of(testCat)),
+            create: jest.fn(() => of(testCat)),
+            update: jest.fn(() => of(testCatUpdate)),
+            remove: jest.fn(() => of()),
           },
         },
       ],
     }).compile();
 
     controller = module.get<CatController>(CatController);
+    service = module.get<CatService>(CatService);
   });
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
 
-
-  it('should add cat structures', () => {
-    let createCatDto = new CatDto('testcat 4', 'testbreed 4', 4);
-    let createCallFunction = controller.create(createCatDto);
-    expect(createCallFunction.name).toEqual('testcat 4');
+  it('should get the Cat', () => {
+    controller.findAll().subscribe((res) => {
+      expect(res).toEqual([testCat]);
+    });
   });
 
-  it('should update a cat structures', () => {
-    let updateCatDto = new CatDto('testcat 1', 'testbreed 1', 2)
-    let updateCallFunction = controller.update(updateCatDto.name, updateCatDto);
-    expect(updateCallFunction.age).toEqual(2);
+  it('should get one cat', () => {
+    controller.findOne('a id').subscribe((res) => {
+      expect(res).toEqual(testCat);
+    });
   });
 
-  it('should findOne a cat structure', () => {
-    let findOneCallFunction = controller.findOne('testcat 1');
-    expect(findOneCallFunction.age).toEqual(2);
+  it('should make a new cat', () => {
+    controller
+      .create({
+        name: 'Test Cat',
+        age: 5,
+        breed: 'Russian Blue',
+      })
+      .subscribe((res) => {
+        expect(res).toEqual(testCat);
+      });
   });
 
-  it('should findAll cat structures', () => {
-    let findOneCallFunction = controller.findAll();
-    expect(findOneCallFunction.length).toEqual(3);
+  it('should make a cat update', () => {
+    controller
+      .update('a id', {
+        id: 5,
+        name: 'Test Cat Update',
+        age: 5,
+        breed: 'Russian Blue',
+      })
+      .subscribe((res) => {
+        expect(res).toEqual(testCatUpdate);
+      });
   });
 
-
-  it('should findAll cat structures', () => {
-    let findOneCallFunction = controller.remove('testcat 4');
-    expect(findOneCallFunction.length).toEqual(3);
+  it('should remove a one cat', () => {
+    controller.remove('a id').subscribe((res) => {
+      expect(res).toBeUndefined();
+      expect(res).toHaveBeenCalled();
+    });
   });
-
-
 });
