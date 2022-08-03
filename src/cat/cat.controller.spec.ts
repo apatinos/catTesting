@@ -1,8 +1,15 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { of } from 'rxjs';
 import { CatController } from './cat.controller';
 import { CatService } from './cat.service';
 import { CatDto } from './dto/cat.dto';
+
+let mockData = [
+  { id: 1, name: 'testcat 1', breed: 'testbreed 1', age: 1 },
+  { id: 2, name: 'testcat 2', breed: 'testbreed 2', age: 2 },
+  { id: 3, name: 'testcat 3', breed: 'testbreed 3', age: 3 },
+];
 
 describe('CatController', () => {
   let controller: CatController;
@@ -14,29 +21,11 @@ describe('CatController', () => {
         {
           provide: CatService,
           useValue: {
-            create: jest
-              .fn()
-              .mockReturnValue(new CatDto('testcat 4', 'testbreed 4', 4)),
-            findAll: jest
-              .fn()
-              .mockReturnValue([
-                new CatDto('testcat 1', 'testbreed 1', 1),
-                new CatDto('testcat 2', 'testbreed 2', 2),
-                new CatDto('testcat 3', 'testbreed 3', 3),
-              ]),
-            update: jest
-              .fn()
-              .mockReturnValue(new CatDto('testcat 1', 'testbreed 1', 2)),
-            findOne: jest
-              .fn()
-              .mockReturnValue(new CatDto('testcat 1', 'testbreed 1', 2)),
-            remove: jest
-              .fn()
-              .mockReturnValue([
-                new CatDto('testcat 1', 'testbreed 1', 1),
-                new CatDto('testcat 2', 'testbreed 2', 2),
-                new CatDto('testcat 3', 'testbreed 3', 3),
-              ]),
+            create: jest.fn().mockReturnValueOnce(of(mockData[0])),
+            findAll: jest.fn().mockReturnValueOnce(of(mockData)),
+            update: jest.fn().mockReturnValueOnce(of(mockData[1])),
+            findOne: jest.fn().mockReturnValueOnce(of(mockData[2])),
+            remove: jest.fn().mockReturnValue(of({})),
           },
         },
       ],
@@ -49,34 +38,35 @@ describe('CatController', () => {
     expect(controller).toBeDefined();
   });
 
-
   it('should add cat structures', () => {
-    let createCatDto = new CatDto('testcat 4', 'testbreed 4', 4);
-    let createCallFunction = controller.create(createCatDto);
-    expect(createCallFunction.name).toEqual('testcat 4');
+    let createCatDto = new CatDto('testcat 1', 'testbreed 1', 1);
+    controller.create(createCatDto).subscribe((data) => {
+      expect(data.name).toEqual('testcat 1');
+    });
   });
 
   it('should update a cat structures', () => {
-    let updateCatDto = new CatDto('testcat 1', 'testbreed 1', 2)
-    let updateCallFunction = controller.update(updateCatDto.name, updateCatDto);
-    expect(updateCallFunction.age).toEqual(2);
+    let updateCatDto = new CatDto('testcat 2', 'testbreed 2', 2);
+    controller.update('1', updateCatDto).subscribe((data) => {
+      expect(data.name).toEqual('testcat 2');
+    });
   });
 
   it('should findOne a cat structure', () => {
-    let findOneCallFunction = controller.findOne('testcat 1');
-    expect(findOneCallFunction.age).toEqual(2);
+    controller.findOne('3').subscribe((data) => {
+      expect(data.name).toEqual('testcat 3');
+    });
   });
 
   it('should findAll cat structures', () => {
-    let findOneCallFunction = controller.findAll();
-    expect(findOneCallFunction.length).toEqual(3);
+    controller.findAll().subscribe((data) => {
+      expect(data).toEqual(mockData);
+    });
   });
-
 
   it('should findAll cat structures', () => {
-    let findOneCallFunction = controller.remove('testcat 4');
-    expect(findOneCallFunction.length).toEqual(3);
+    controller.remove('3').subscribe((data) => {
+      expect(data).toEqual({});
+    });
   });
-
-
 });

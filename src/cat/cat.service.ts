@@ -1,44 +1,40 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
+import { map } from 'rxjs';
 import { CatDto } from './dto/cat.dto';
 import { Cat } from './entities/cat.entity';
 
 @Injectable()
 export class CatService {
-  cats: Cat[] = [
-    new CatDto('testcat 1', 'testbreed 1', 1),
-    new CatDto('testcat 2', 'testbreed 2', 2),
-    new CatDto('testcat 3', 'testbreed 3', 3),
-  ];
+  constructor(private httpService: HttpService) {}
 
   create(createCatDto: CatDto) {
-    let cat: Cat = {
-      ...createCatDto,
-    };
-    this.cats.push(cat);
-    return cat;
+    return this.httpService
+      .post('http://localhost:3000/cats', createCatDto)
+      .pipe(map((response) => response.data));
   }
 
   findAll() {
-    return this.cats;
+    return this.httpService
+      .get('http://localhost:3000/cats')
+      .pipe(map((response) => response.data));
   }
 
-  findOne(name: string) {
-    const catFinded  = this.cats.find((cat)=> cat.name == name);
-    if(!catFinded){
-      throw new BadRequestException('no se encontro del gato con el  nombre: '+name)
-    }
-    return catFinded;
+  findOne(id: string) {
+    return this.httpService
+      .get(`http://localhost:3000/cats/${id}`)
+      .pipe(map((response) => response.data));
   }
 
-  update(name: string, updateCatDto: Cat) {
-    this.cats.map((cat)=>{if(cat.name == name) return updateCatDto});
-    return updateCatDto;
+  update(id: string, updateCatDto: CatDto) {
+    return this.httpService
+      .put(`http://localhost:3000/cats/${id}`, updateCatDto)
+      .pipe(map((response) => response.data));
   }
 
-  remove(name: string) {
-    this.cats = this.cats.filter((cat)=>{
-      return cat.name != name
-    })
-    return this.cats;
+  remove(id: string) {
+    return this.httpService
+      .delete(`http://localhost:3000/cats/${id}`)
+      .pipe(map((response) => response.data));
   }
 }

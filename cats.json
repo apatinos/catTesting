@@ -1,0 +1,28 @@
+{
+  "cats": [
+    {
+      "id": 2,
+      "name": "testcat 2",
+      "breed": "testbreed 2",
+      "age": 2
+    },
+    {
+      "id": 3,
+      "name": "testcat 3",
+      "breed": "testbreed 3",
+      "age": 3
+    },
+    {
+      "name": "testcat 4",
+      "breed": "testbreed 4",
+      "age": 4,
+      "id": 4
+    },
+    {
+      "name": "testcat 4",
+      "breed": "testbreed 4",
+      "age": 4,
+      "id": 5
+    }
+  ]
+}
