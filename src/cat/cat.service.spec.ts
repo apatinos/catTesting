@@ -1,7 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CatService } from './cat.service';
-import { AxiosResponse } from 'axios';
 import { of } from 'rxjs';
 
 let mockData = [
@@ -9,6 +8,8 @@ let mockData = [
   { id: 2, name: 'testcat 2', breed: 'testbreed 2', age: 2 },
   { id: 3, name: 'testcat 3', breed: 'testbreed 3', age: 3 },
 ];
+
+let mockTransformData = { id: 1, name: 'cat 1', breed: 'testbreed 1', age: 1 };
 
 let mockResponse = (data) => {
   return {
@@ -75,11 +76,56 @@ describe('CatService', () => {
 
     let getSpy = jest.spyOn(httpService, 'get');
     getSpy.mockReturnValueOnce(of(mockResponse({ id, ...catDto })));
-    
-    service.findOne(""+id).subscribe((data)=>{
-      expect(data).toEqual(mockResponse({ id, ...catDto }).data)
-    })
 
-    
+    const transformCatSpy = jest.spyOn(service, 'transformName');
+    transformCatSpy.mockReturnValueOnce(mockTransformData);
+
+    service.findOne('' + id).subscribe({
+      next: (cat) => {
+        catDto = cat;
+      },
+      error: () => {},
+      complete: () => {
+        expect(getSpy).toBeCalledTimes(1);
+        expect(transformCatSpy).toBeCalledTimes(1);
+        expect(mockTransformData);
+      },
+    });
   });
+
+  it('should get all cats', () => {
+    let getSpy = jest.spyOn(httpService, 'get');
+    getSpy.mockReturnValueOnce(of(mockResponse(mockData)));
+
+    service.findAll().subscribe((data) => {
+      expect(data).toEqual(mockResponse(mockData).data);
+    });
+  });
+
+  it('Should update a cat data', () => {
+    const { id, ...catDataUpdate } = mockData[2];
+
+    let updateSpy = jest.spyOn(httpService, 'put');
+    updateSpy.mockReturnValueOnce(of(mockResponse(mockData[2])));
+
+    service.update('' + id, catDataUpdate).subscribe((data) => {
+      expect(data).toEqual(mockResponse(mockData[2]).data);
+    });
+  });
+
+  it('Should Delete a cat data', () => {
+    let deleteSpy = jest.spyOn(httpService, 'delete');
+    deleteSpy.mockReturnValueOnce(of(mockResponse(mockData[1])));
+
+    service.remove('2').subscribe((data) => {
+      expect(data).toEqual(mockResponse(mockData[1]).data);
+    });
+  });
+
+  it('Should transform Cat Data', ()=>{
+    const cat = mockData[0];
+    let catTransform = service.transformName(cat);
+    expect(catTransform).toEqual(mockTransformData);
+
+  })
 });
