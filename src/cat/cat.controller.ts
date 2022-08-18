@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
 } from '@nestjs/common';
+import { CatPipe } from '../common/pipes/cat.pipe';
 import { CatService } from './cat.service';
 import { CatDto } from './dto/cat.dto';
 
@@ -16,7 +17,7 @@ export class CatController {
   constructor(private readonly catService: CatService) {}
 
   @Post()
-  create(@Body() createCatDto: CatDto) {
+  create(@Body(CatPipe) createCatDto: CatDto) {
     return this.catService.create(createCatDto);
   }
 
