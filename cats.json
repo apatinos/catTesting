@@ -11,18 +11,6 @@
       "name": "testcat 3",
       "breed": "testbreed 3",
       "age": 3
-    },
-    {
-      "name": "testcat 4",
-      "breed": "testbreed 4",
-      "age": 4,
-      "id": 4
-    },
-    {
-      "name": "testcat 4",
-      "breed": "testbreed 4",
-      "age": 4,
-      "id": 5
     }
   ]
 }

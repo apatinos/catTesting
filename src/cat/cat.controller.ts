@@ -1,8 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+} from '@nestjs/common';
+import { CatInterceptor } from '../common/interceptors/cat.interceptor';
 import { CatService } from './cat.service';
 import { CatDto } from './dto/cat.dto';
 
 @Controller('cat')
+@UseInterceptors(CatInterceptor)
 export class CatController {
   constructor(private readonly catService: CatService) {}
 
