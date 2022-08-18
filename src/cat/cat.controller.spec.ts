@@ -47,13 +47,13 @@ describe('CatController', () => {
 
   it('should update a cat structures', () => {
     let updateCatDto = new CatDto('testcat 2', 'testbreed 2', 2);
-    controller.update('1', updateCatDto).subscribe((data) => {
+    controller.update(1, updateCatDto).subscribe((data) => {
       expect(data.name).toEqual('testcat 2');
     });
   });
 
   it('should findOne a cat structure', () => {
-    controller.findOne('3').subscribe((data) => {
+    controller.findOne(3).subscribe((data) => {
       expect(data.name).toEqual('testcat 3');
     });
   });
@@ -65,7 +65,7 @@ describe('CatController', () => {
   });
 
   it('should findAll cat structures', () => {
-    controller.remove('3').subscribe((data) => {
+    controller.remove(3).subscribe((data) => {
       expect(data).toEqual({});
     });
   });
