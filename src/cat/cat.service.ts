@@ -20,19 +20,19 @@ export class CatService {
       .pipe(map((response) => response.data));
   }
 
-  findOne(id: string) {
+  findOne(id: number) {
     return this.httpService
       .get(`http://localhost:3000/cats/${id}`)
       .pipe(map((response) => this.transformName(response.data)));
   }
 
-  update(id: string, updateCatDto: CatDto) {
+  update(id: number, updateCatDto: CatDto) {
     return this.httpService
       .put(`http://localhost:3000/cats/${id}`, updateCatDto)
       .pipe(map((response) => response.data));
   }
 
-  remove(id: string) {
+  remove(id: number) {
     return this.httpService
       .delete(`http://localhost:3000/cats/${id}`)
       .pipe(map((response) => response.data));

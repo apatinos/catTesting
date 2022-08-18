@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
   UseInterceptors,
 } from '@nestjs/common';
 import { CatInterceptor } from '../common/interceptors/cat.interceptor';
@@ -28,17 +29,17 @@ export class CatController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.catService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCatDto: CatDto) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateCatDto: CatDto) {
     return this.catService.update(id, updateCatDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.catService.remove(id);
   }
 }

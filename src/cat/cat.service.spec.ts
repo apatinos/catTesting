@@ -80,7 +80,7 @@ describe('CatService', () => {
     const transformCatSpy = jest.spyOn(service, 'transformName');
     transformCatSpy.mockReturnValueOnce(mockTransformData);
 
-    service.findOne('' + id).subscribe({
+    service.findOne(id).subscribe({
       next: (cat) => {
         catDto = cat;
       },
@@ -108,7 +108,7 @@ describe('CatService', () => {
     let updateSpy = jest.spyOn(httpService, 'put');
     updateSpy.mockReturnValueOnce(of(mockResponse(mockData[2])));
 
-    service.update('' + id, catDataUpdate).subscribe((data) => {
+    service.update(id, catDataUpdate).subscribe((data) => {
       expect(data).toEqual(mockResponse(mockData[2]).data);
     });
   });
@@ -117,15 +117,14 @@ describe('CatService', () => {
     let deleteSpy = jest.spyOn(httpService, 'delete');
     deleteSpy.mockReturnValueOnce(of(mockResponse(mockData[1])));
 
-    service.remove('2').subscribe((data) => {
+    service.remove(2).subscribe((data) => {
       expect(data).toEqual(mockResponse(mockData[1]).data);
     });
   });
 
-  it('Should transform Cat Data', ()=>{
+  it('Should transform Cat Data', () => {
     const cat = mockData[0];
     let catTransform = service.transformName(cat);
     expect(catTransform).toEqual(mockTransformData);
-
-  })
+  });
 });
